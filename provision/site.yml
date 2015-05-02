@@ -1,5 +1,6 @@
 ---
 - hosts: local
+  sudo: yes
   vars:
     - environment: development
     - timezone: Europe/Moscow

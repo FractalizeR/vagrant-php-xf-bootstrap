@@ -1,6 +1,15 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# There can be VirtualBox problems setting network adapter on Linux. If you see the following error message:
+# "A host only network interface you're attempting to configure via DHCP
+# already has a conflicting host only adapter with DHCP enabled. The
+# DHCP on this adapter is incompatible with the DHCP settings."
+#
+# Try the following commands:
+# VBoxManage hostonlyif create
+# VBoxManage dhcpserver remove --netname HostInterfaceNetworking-vboxnet0
+
 require 'rubygems'
 require 'digest'
 require './lib/os_detect.rb'
@@ -32,7 +41,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Minimalistic CentOS 7
   config.vm.box = "fhteam/centos-7.0-x86_64-minimal"
 
-  # Configure automaticaly updates
+  # Configure automatically updates
   config.vm.box_check_update = true
   config.vbguest.auto_update = false
 
@@ -51,11 +60,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # @link http://www.virtualbox.org/manual/ch08.html
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
-    vb.customize ["modifyvm", :id, "--cpus", "4"]
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
-    vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
-    vb.customize ["modifyvm", :id, "--largepages", "on"]
-    vb.customize ["modifyvm", :id, "--cpuexecutioncap", "100"]
+    vb.name = "ThirisCart Development Environment"
   end
 
   # Mounting folders
@@ -69,5 +74,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "if ! rpm -q epel-release-7-5 > /dev/null ; then yum localinstall -y http://mirror.logol.ru/epel/7/x86_64/e/epel-release-7-5.noarch.rpm; fi"
   config.vm.provision "shell", inline: "if ! rpm -q ansible > /dev/null ; then yum install -y ansible; fi"
   config.vm.synced_folder './provision', '/vagrant/provision', mount_options: ["fmode=666"]
-  config.vm.provision "shell", inline: "ansible-playbook /vagrant/provision/site.yml --inventory=/vagrant/provision/hosts --check"
+  config.vm.provision "shell", inline: "ansible-playbook /vagrant/provision/site.yml --inventory=/vagrant/provision/hosts"
 end
