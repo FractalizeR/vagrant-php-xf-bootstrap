@@ -1,0 +1,21 @@
+---
+- hosts: local
+  vars:
+    - environment: development
+    - timezone: Europe/Moscow
+  roles:
+    - role: web
+      http_user: "{{ 'vagrant' if environment == 'development' else 'nginx' }}"
+      site_id: thiriscart
+      domains:
+        - www.thiriscart.local
+      ssl: no
+    - role: postgres
+      database: thiris
+      user: thiris
+      password: thiris
+      extensions:
+        - citext
+    - role: redis
+    - role: elastic
+    - role: rabbitmq
