@@ -61,6 +61,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
     vb.name = "ThirisCart Development Environment"
+    vb.customize ["modifyvm", :id, "--cpus", "2"]
+    vb.customize ["modifyvm", :id, "--memory", "1536"]
+    vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+    vb.customize ["modifyvm", :id, "--largepages", "on"]
+    vb.customize ["modifyvm", :id, "--cpuexecutioncap", "80"]
+
   end
 
   # Mounting folders
@@ -74,5 +80,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "if ! rpm -q epel-release-7-5 > /dev/null ; then yum localinstall -y http://mirror.logol.ru/epel/7/x86_64/e/epel-release-7-5.noarch.rpm; fi"
   config.vm.provision "shell", inline: "if ! rpm -q ansible > /dev/null ; then yum install -y ansible; fi"
   config.vm.synced_folder './provision', '/vagrant/provision', mount_options: ["fmode=666"]
-  config.vm.provision "shell", inline: "ansible-playbook /vagrant/provision/site.yml --inventory=/vagrant/provision/hosts"
+  config.vm.provision "shell", keep_color:true, inline: "export PYTHONUNBUFFERED=1 && ansible-playbook /vagrant/provision/site.yml --inventory=/vagrant/provision/hosts"
 end

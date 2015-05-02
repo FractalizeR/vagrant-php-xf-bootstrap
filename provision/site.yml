@@ -4,6 +4,8 @@
   vars:
     - environment: development
     - timezone: Europe/Moscow
+    - locale_long: ru_RU
+    - locale_short: ru
   roles:
     - role: web
       http_user: "{{ 'vagrant' if environment == 'development' else 'nginx' }}"
