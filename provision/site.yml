@@ -2,13 +2,13 @@
 - hosts: local
   sudo: yes
   vars:
-    environment: development
+    env_name: development
     timezone: Europe/Moscow
     locale_long: ru_RU
     locale_short: ru
   roles:
     - role: web
-      http_user: "{{ 'vagrant' if environment == 'development' else 'nginx' }}"
+      http_user: "{{ 'vagrant' if env_name == 'development' else 'nginx' }}"
       site_id: thiriscart
       domains:
         - www.thiriscart.local
