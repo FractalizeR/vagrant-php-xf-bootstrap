@@ -50,7 +50,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "forwarded_port", guest: 5432, host: 5432    # Postgresql
   config.vm.network "forwarded_port", guest: 6379, host: 6379    # Redis
   config.vm.network "forwarded_port", guest: 5672, host: 5672    # RabbitMQ
-  config.vm.network "forwarded_port", guest: 9300, host: 9300    # ElasticSearch
+  config.vm.network "forwarded_port", guest: 9300, host: 9200    # ElasticSearch
   config.vm.network "forwarded_port", guest: 15672, host: 15672  # Rabbitmq management console
 
   config.vm.network "private_network", type: "dhcp"
