@@ -69,12 +69,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   end
 
-  # Mounting folders
-#   if OS.windows?
-#     config.vm.synced_folder local, remote
-#   else
-#     config.vm.synced_folder local, remote, type: "nfs", mount_options: ['nolock,vers=3,udp,noatime,actimeo=1']
-#   end
+  if OS.windows?
+    config.vm.synced_folder './../ThirisCart', '/var/www/thiriscart'
+  else
+    config.vm.synced_folder './../ThirisCart', '/var/www/thiriscart', type: "nfs", mount_options: ['nolock,vers=3,udp,noatime,actimeo=1']
+  end
 
 
   config.vm.provision "shell", inline: "if ! rpm -q epel-release-7-5 > /dev/null ; then yum localinstall -y http://mirror.logol.ru/epel/7/x86_64/e/epel-release-7-5.noarch.rpm; fi"
