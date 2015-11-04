@@ -73,9 +73,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Mouting main website folder
     if OS.windows?
-      config.vm.synced_folder './../ThirisCartBackend', '/var/www/thiriscart'
+      config.vm.synced_folder './../ThirisCart', '/var/www/thiriscart'
     else
-      config.vm.synced_folder './../ThirisCartBackend', '/var/www/thiriscart', type: "nfs", mount_options: ['nolock,vers=3,udp,noatime,actimeo=1']
+      config.vm.synced_folder './../ThirisCart', '/var/www/thiriscart', type: "nfs", mount_options: ['nolock,vers=3,udp,noatime,actimeo=1']
     end
 
 
