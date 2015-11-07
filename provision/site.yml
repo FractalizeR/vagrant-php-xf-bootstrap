@@ -15,9 +15,9 @@
         - thiriscart.local
       ssl: no
     - role: postgres
-      database: thiris
-      user: thiris
-      password: thiris
+      database: thiriscart
+      user: thiriscart
+      password: thiriscart
       extensions:
         - citext
     - role: redis
