@@ -12,6 +12,7 @@
 
 require 'rubygems'
 require 'digest'
+require 'yaml'
 require './lib/vagrant/os_detect.rb'
 
 # Configuration files
@@ -26,32 +27,48 @@ REQUIREMENTS.each do |pluginName|
 end
 
 # Ansible file checks
-if not File.exist?("./provision/site.yml")
-    puts "You must create main playbook file for Ansible named 'site.yml' next to Vagrantfile!\n"
+if not File.exist?("./site.yml")
+    puts "You must create main playbook file for Ansible named 'site.yml' next to Vagrantfile! See site.example.yml for instructions\n"
     exit
 end
 
-if not File.exist?("./provision/hosts")
-    puts "You must create inventory file for Ansible named 'hosts' next to Vagrantfile!\n"
+if not File.exist?("./hosts")
+    puts "You must create inventory file for Ansible named 'hosts' next to Vagrantfile! See hosts.example.txt for instructions\n"
     exit
 end
+
+settings = YAML.load_file('./site.yml')
 
 # Main vagrant configuration
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Minimalistic CentOS 7
-    config.vm.box = "fhteam/centos-7.0-x86_64-minimal"
+    config.vm.box = "centos/7"
 
     # Configure automatically updates
     config.vm.box_check_update = true
-    config.vbguest.auto_update = false
+    config.vbguest.auto_update = true
 
     # Port forwarding
-    config.vm.network "forwarded_port", guest: 80, host: 8080      # Nginx
-    config.vm.network "forwarded_port", guest: 5432, host: 5432    # Postgresql
-    config.vm.network "forwarded_port", guest: 6379, host: 6379    # Redis
-    config.vm.network "forwarded_port", guest: 5672, host: 5672    # RabbitMQ
-    config.vm.network "forwarded_port", guest: 9300, host: 9200    # ElasticSearch
-    config.vm.network "forwarded_port", guest: 15672, host: 15672  # Rabbitmq management console
+    if settings.roles.any?{|a| a.role == "web"}
+        config.vm.network "forwarded_port", guest: 80, host: 8080      # Nginx
+    end
+
+    if settings.roles.any?{|a| a.role == "postgres"}
+        config.vm.network "forwarded_port", guest: 5432, host: 5432    # Postgresql
+    end
+
+    if settings.roles.any?{|a| a.role == "redis"}
+        config.vm.network "forwarded_port", guest: 6379, host: 6379    # Redis
+    end
+
+    if settings.roles.any?{|a| a.role == "rabbitmq"}
+        config.vm.network "forwarded_port", guest: 5672, host: 5672    # RabbitMQ
+        config.vm.network "forwarded_port", guest: 15672, host: 15672  # Rabbitmq management console
+    end
+
+    if settings.roles.any?{|a| a.role == "elastic"}
+        config.vm.network "forwarded_port", guest: 9300, host: 9200    # ElasticSearch
+    end
 
     config.vm.network "private_network", type: "dhcp"
 
@@ -72,15 +89,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision "shell", path: './lib/shell/firewalld.sh'
 
     # Mouting main website folder
+    project_folder_local = './../' + settings.vars.project_name_snake;
+    project_local_vm = '/var/www/' + settings.vars.project_name_snake
     if OS.windows?
-      config.vm.synced_folder './../ThirisCart', '/var/www/thiriscart'
+      config.vm.synced_folder project_folder_local, project_local_vm
     else
-      config.vm.synced_folder './../ThirisCart', '/var/www/thiriscart', type: "nfs", mount_options: ['nolock,vers=3,udp,noatime,actimeo=1']
+      config.vm.synced_folder project_folder_local, project_local_vm, type: "nfs", mount_options: ['nolock,vers=3,udp,noatime,actimeo=1']
     end
 
-
+    # Installing and running Ansible to provision server
     config.vm.provision "shell", inline: "if ! rpm -q epel-release-7-5 > /dev/null ; then yum localinstall -y http://mirror.logol.ru/epel/7/x86_64/e/epel-release-7-5.noarch.rpm; fi"
     config.vm.provision "shell", inline: "if ! rpm -q ansible > /dev/null ; then yum install -y ansible; fi"
-    config.vm.synced_folder './provision', '/vagrant/provision', mount_options: ["fmode=666"]
-    config.vm.provision "shell", keep_color:true, inline: "export PYTHONUNBUFFERED=1 && ansible-playbook /vagrant/provision/site.yml --inventory=/vagrant/provision/hosts"
+    config.vm.provision "shell", keep_color:true, inline: "export PYTHONUNBUFFERED=1 && ansible-playbook /vagrant/site.yml --inventory=/vagrant/hosts"
 end
