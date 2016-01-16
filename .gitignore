@@ -8,3 +8,5 @@
 .idea/
 
 vagrant_vars.rb
+hosts
+site.yml

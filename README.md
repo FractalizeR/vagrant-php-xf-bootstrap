@@ -31,7 +31,7 @@ So, to quickly bootstrap your project you should do the following:
  - Create project directory
  - Execute `git clone --recursive https://github.com/FractalizeR/vagrant-bootstrap.git`. Mind `--recursive` switch to clone with submodules!
  - Execute `git clone --recursive https://github.com/<YOUR_PROJECT>/<YOUR_REPO>`
- - Go to `vagrant-bootstrap` directory and make copies of `*.example.*` files, removing `.example` part from the name (`hosts.example.txt` => `hosts.txt`, `site.example.yml` => `site.yml` etc).
+ - Go to `vagrant-bootstrap` directory and make copies of `*.example.*` files, removing `.example` part from the name (`hosts.example` => `hosts`, `site.example.yml` => `site.yml` etc).
  - Edit renamed files making adjustments suitable for your project
  - Execute `vagrant up`.
 
