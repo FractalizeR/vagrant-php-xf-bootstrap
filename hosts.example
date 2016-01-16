@@ -1,2 +1,17 @@
-[local]
-127.0.0.1 ansible_connection=local
+#!/bin/bash
+
+# Making this host file bash executable so that it could be used on Windows systems
+# (vboxsf filesystem mounts files as 0777, ansible versions prior to 2.x treat such files as executables)
+
+cat <<EOF
+{
+    "local": {
+        "hosts": [
+            "127.0.0.1"
+        ],
+        "vars": {
+            "ansible_connection": "local"
+        }
+    }
+}
+EOF

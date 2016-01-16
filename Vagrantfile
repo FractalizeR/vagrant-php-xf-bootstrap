@@ -42,31 +42,32 @@ settings = YAML.load_file('./site.yml')
 # Main vagrant configuration
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Minimalistic CentOS 7
-    config.vm.box = "centos/7"
+    config.vm.box = "bento/centos-7.2"
 
     # Configure automatically updates
     config.vm.box_check_update = true
     config.vbguest.auto_update = true
 
     # Port forwarding
-    if settings.roles.any?{|a| a.role == "web"}
+    roles = settings[0]['roles'];
+    if roles.any?{|a| a['role'] == "web"}
         config.vm.network "forwarded_port", guest: 80, host: 8080      # Nginx
     end
 
-    if settings.roles.any?{|a| a.role == "postgres"}
+    if roles.any?{|a| a['role'] == "postgres"}
         config.vm.network "forwarded_port", guest: 5432, host: 5432    # Postgresql
     end
 
-    if settings.roles.any?{|a| a.role == "redis"}
+    if roles.any?{|a| a['role'] == "redis"}
         config.vm.network "forwarded_port", guest: 6379, host: 6379    # Redis
     end
 
-    if settings.roles.any?{|a| a.role == "rabbitmq"}
+    if roles.any?{|a| a['role'] == "rabbitmq"}
         config.vm.network "forwarded_port", guest: 5672, host: 5672    # RabbitMQ
         config.vm.network "forwarded_port", guest: 15672, host: 15672  # Rabbitmq management console
     end
 
-    if settings.roles.any?{|a| a.role == "elastic"}
+    if roles.any?{|a| a['role'] == "elastic"}
         config.vm.network "forwarded_port", guest: 9300, host: 9200    # ElasticSearch
     end
 
@@ -77,7 +78,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # @link http://www.virtualbox.org/manual/ch08.html
     config.vm.provider "virtualbox" do |vb|
       vb.gui = false
-      vb.name = "ThirisCart Development Environment"
+      vb.name = settings[0]['vars']['project_name_camel'] + " Development Environment"
       vb.customize ["modifyvm", :id, "--cpus", "2"]
       vb.customize ["modifyvm", :id, "--memory", "1536"]
       vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
@@ -89,8 +90,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision "shell", path: './lib/shell/firewalld.sh'
 
     # Mouting main website folder
-    project_folder_local = './../' + settings.vars.project_name_snake;
-    project_local_vm = '/var/www/' + settings.vars.project_name_snake
+    project_name_snake = settings[0]['vars']['project_name_snake']
+    project_folder_local = './../' + project_name_snake + "_src";
+    project_local_vm = '/var/www/' + project_name_snake;
+
+    if not File.exist?(project_folder_local)
+        puts "Project folder '#{project_folder_local}' is not found. Attemting to create"
+        Dir.mkdir(project_folder_local)
+        puts "Created project folder '#{project_folder_local}'."
+    end
+
     if OS.windows?
       config.vm.synced_folder project_folder_local, project_local_vm
     else
@@ -100,5 +109,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Installing and running Ansible to provision server
     config.vm.provision "shell", inline: "if ! rpm -q epel-release-7-5 > /dev/null ; then yum localinstall -y http://mirror.logol.ru/epel/7/x86_64/e/epel-release-7-5.noarch.rpm; fi"
     config.vm.provision "shell", inline: "if ! rpm -q ansible > /dev/null ; then yum install -y ansible; fi"
+    config.vm.provision "shell", inline: "chmod +x /vagrant/hosts"
     config.vm.provision "shell", keep_color:true, inline: "export PYTHONUNBUFFERED=1 && ansible-playbook /vagrant/site.yml --inventory=/vagrant/hosts"
 end

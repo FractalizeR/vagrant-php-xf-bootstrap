@@ -40,3 +40,20 @@ Now your project is alive and kicking!
 Details
 ========================
 If you change something in your previously `.example.*` files, you will have to run `vagrant provision` for changes to make effect
+
+Troubleshooting
+========================
+
+  - There can be VirtualBox problems setting network adapter. If you see the following error message: "A host only network interface you're attempting to configure via DHCP already has a conflicting host only adapter with DHCP enabled. The DHCP on this adapter is incompatible with the DHCP settings." Try the following commands:
+```bash
+VBoxManage hostonlyif create
+VBoxManage dhcpserver remove --netname HostInterfaceNetworking-vboxnet0
+```
+
+That might not work. In this case you can go to Virtual Box -> File -> Preferences -> Network, remove all network interfaces and let Vagrant reconfigure Virtual box himself.
+
+ - If you have an error about rsync installation, download and install Cygwin https://cygwin.com/install.html and put Cygwin's bin folder (C:\cygwin64\bin\ by default) into PATH variable. Usually vagrant falls back to rsync when vbguest plugin fails to install VirtualBox Guest Additions. See below
+
+ - If VirtualBox Guest Additions installation failed at your VM, it usually means, that kernel packages are [incorrectly updated](http://unix.stackexchange.com/questions/170089/does-centos-7-incorrectly-sort-kernel-menu-entries-in-grub-cfg). In this case you should manually SSH into your VM, check with yum which kernel version is currently the latest (`yum list kernel*`), install it with `sudo yum install kernel-3.10.0-327.4.4.el7`, `sudo yum install kernel-devel-3.10.0-327.4.4.el7` and `sudo yum install kernel-headers-3.10.0-327.4.4.el7`.
+
+ - If Vagrant VBGuest constantly reports about versions of VirtualBox Guest Additions to be different on host and guest, manually go to [https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads) and redownload/reinstall latest (or previous, if you have latest already) VB package.

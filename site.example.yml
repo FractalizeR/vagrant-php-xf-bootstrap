@@ -14,21 +14,21 @@
     locale_short: ru
 
     # Project name in various spelling to substitute into file and folder paths.
-    project_name_camel: ThirisCart
-    project_name_snake: thiris_cart
-    project_name_www: thiris-cart
+    project_name_camel: OOTalks
+    project_name_snake: oo_talks
+    project_name_www: oo-talks
   roles:
     - role: web
       http_user: "{{ 'vagrant' if env_name == 'development' else 'nginx' }}"
-      site_id: {{ project_name_snake }}
+      site_id: "{{ project_name_snake }}"
       domains:
-        - www.{{ project_name_www }}.local
-        - {{ project_name_www }}.local
+        - "www.{{ project_name_www }}.local"
+        - "{{ project_name_www }}.local"
       ssl: no
     - role: postgres
-      database: {{ project_name_snake }}
-      user: {{ project_name_snake }}
-      password: {{ project_name_snake }}
+      database: "{{ project_name_snake }}"
+      user: "{{ project_name_snake }}"
+      password: "{{ project_name_snake }}"
       extensions:
         - citext
     - role: redis
