@@ -1,3 +1,6 @@
 [submodule "roles"]
 	path = roles
 	url = https://github.com/FractalizeR/ansible-playbooks.git
+[submodule "lib"]
+	path = lib
+	url = https://github.com/FractalizeR/vagrant-libs.git
