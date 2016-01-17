@@ -18,7 +18,7 @@ or send a letter to The Apache Software Foundation Dept. 9660 Los Angeles, CA 90
 Intro
 ========================
 
-This is a vagrant deployment skeleton to quickly bootstrap web development.
+This is a vagrant deployment skeleton to quickly bootstrap web development for XenForo forum engine.
 
 It can quickly install and configure for you the following services:
 
