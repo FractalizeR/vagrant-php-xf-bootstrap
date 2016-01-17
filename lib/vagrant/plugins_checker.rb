@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
 #
 # This project is maintained by:
@@ -18,13 +19,13 @@
 # or send a letter to The Apache Software Foundation Dept. 9660 Los Angeles, CA 90084-9660 U.S.A.
 #
 
-systemctl enable firewalld.service
-systemctl start firewalld.service
-firewall-cmd --zone=internal --change-interface=vboxnet0
-
-# Enabling NFS file sharing for Vagrant
-firewall-cmd --permanent --zone=internal --add-service=nfs
-firewall-cmd --permanent --zone=internal --add-service=rpc-bind
-firewall-cmd --permanent --zone=internal --add-service=mountd
-firewall-cmd --permanent --zone=internal --add-port=2049/udp
-firewall-cmd --reload
+module PluginsChecker
+    def PluginsChecker.ensurePluginsInstalled(pluginsList)
+        # Check plugin requirements
+        pluginsList.each do |pluginName|
+            unless Vagrant.has_plugin?(pluginName)
+              raise 'Vagrant plugin <%s> must be installed!' % pluginName
+            end
+        end
+    end
+end

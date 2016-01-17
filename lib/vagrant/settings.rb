@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
 #
 # This project is maintained by:
@@ -18,13 +19,11 @@
 # or send a letter to The Apache Software Foundation Dept. 9660 Los Angeles, CA 90084-9660 U.S.A.
 #
 
-systemctl enable firewalld.service
-systemctl start firewalld.service
-firewall-cmd --zone=internal --change-interface=vboxnet0
+require 'yaml'
 
-# Enabling NFS file sharing for Vagrant
-firewall-cmd --permanent --zone=internal --add-service=nfs
-firewall-cmd --permanent --zone=internal --add-service=rpc-bind
-firewall-cmd --permanent --zone=internal --add-service=mountd
-firewall-cmd --permanent --zone=internal --add-port=2049/udp
-firewall-cmd --reload
+module Settings
+    def Settings.readFromYml(ymlFile)
+        settings = YAML.load_file('./site.yml')
+        settings[0]
+    end
+end
