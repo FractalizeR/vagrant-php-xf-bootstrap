@@ -21,6 +21,8 @@
     - role: web
       http_user: "{{ 'vagrant' if env_name == 'development' else 'nginx' }}"
       site_id: "{{ project_name_snake }}"
+      site_web_folder: ""
+      app_type: regular
       domains:
         - "www.{{ project_name_www }}.local"
         - "{{ project_name_www }}.local"
